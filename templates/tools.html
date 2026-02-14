@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Calculator Tools - Gold Assay Analyzer{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-lg"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent fw-bold text-primary py-3">
+                <i class="fas fa-tint me-2"></i>Moisture Content
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Wet Weight (g)</label>
+                    <input type="number" id="mw" class="form-control bg-light" step="0.01">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Dry Weight (g)</label>
+                    <input type="number" id="md" class="form-control bg-light" step="0.01">
+                </div>
+                <button onclick="calculate('moisture')" class="btn btn-outline-primary w-100 fw-bold">Calculate</button>
+                <div id="result-moisture" class="mt-3 text-center d-none p-3 bg-light rounded">
+                    <div class="display-6 fw-bold text-primary" id="value-moisture"></div>
+                    <small class="text-muted" id="formula-moisture"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-lg"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent fw-bold text-success py-3">
+                <i class="fas fa-flask me-2"></i>Pulp Density
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">SG Dry Solids</label>
+                    <input type="number" id="sd" class="form-control bg-light" step="0.01" placeholder="2.65">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">SG Pulp/Slurry</label>
+                    <input type="number" id="sp" class="form-control bg-light" step="0.01" placeholder="1.40">
+                </div>
+                <button onclick="calculate('pulp_density')"
+                    class="btn btn-outline-success w-100 fw-bold">Calculate</button>
+                <div id="result-pulp_density" class="mt-3 text-center d-none p-3 bg-light rounded">
+                    <div class="display-6 fw-bold text-success" id="value-pulp_density"></div>
+                    <small class="text-muted" id="formula-pulp_density"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-lg"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent fw-bold text-warning py-3">
+                <i class="fas fa-coins me-2"></i>Bullion Fineness
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Gold Weight (g)</label>
+                    <input type="number" id="au" class="form-control bg-light" step="0.001">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Total Weight (g)</label>
+                    <input type="number" id="wt" class="form-control bg-light" step="0.001">
+                </div>
+                <button onclick="calculate('fineness')" class="btn btn-outline-warning w-100 fw-bold">Calculate</button>
+                <div id="result-fineness" class="mt-3 text-center d-none p-3 bg-light rounded">
+                    <div class="display-6 fw-bold text-warning" id="value-fineness"></div>
+                    <small class="text-muted" id="formula-fineness"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-lg"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent fw-bold text-info py-3">
+                <i class="fas fa-chart-bar me-2"></i>Weighted Average
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Sample Data (Weight Grade)</label>
+                    <textarea id="wavg-data" class="form-control bg-light" rows="5"
+                        placeholder="Enter one sample per line:&#10;100 2.5&#10;200 3.0&#10;50 1.2"></textarea>
+                </div>
+                <button onclick="calculate('weighted_avg')"
+                    class="btn btn-outline-info w-100 fw-bold">Calculate</button>
+                <div id="result-weighted_avg" class="mt-3 text-center d-none p-3 bg-light rounded">
+                    <div class="display-6 fw-bold text-info" id="value-weighted_avg"></div>
+                    <small class="text-muted" id="formula-weighted_avg"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-lg"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent fw-bold text-danger py-3">
+                <i class="fas fa-percentage me-2"></i>Recovery Calculation
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Feed Grade (g/t)</label>
+                    <input type="number" id="feed" class="form-control bg-light" step="0.01">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Concentrate Grade (g/t)</label>
+                    <input type="number" id="conc" class="form-control bg-light" step="0.01">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Tailings Grade (g/t)</label>
+                    <input type="number" id="tail" class="form-control bg-light" step="0.01">
+                </div>
+                <button onclick="calculate('recovery')" class="btn btn-outline-danger w-100 fw-bold">Calculate</button>
+                <div id="result-recovery" class="mt-3 text-center d-none p-3 bg-light rounded">
+                    <div class="display-6 fw-bold text-danger" id="value-recovery"></div>
+                    <small class="text-muted" id="formula-recovery"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-lg"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent fw-bold text-secondary py-3">
+                <i class="fas fa-compress-arrows-alt me-2"></i>Concentration Ratio
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Feed Grade (g/t)</label>
+                    <input type="number" id="cr_feed" class="form-control bg-light" step="0.01">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-uppercase fw-bold text-muted">Concentrate Grade (g/t)</label>
+                    <input type="number" id="cr_conc" class="form-control bg-light" step="0.01">
+                </div>
+                <button onclick="calculate('concentration_ratio')"
+                    class="btn btn-outline-secondary w-100 fw-bold">Calculate</button>
+                <div id="result-concentration_ratio" class="mt-3 text-center d-none p-3 bg-light rounded">
+                    <div class="display-6 fw-bold text-secondary" id="value-concentration_ratio"></div>
+                    <small class="text-muted" id="formula-concentration_ratio"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function calculate(type) {
+        let data = { type: type };
+
+        if (type === 'moisture') {
+            data.wet_weight = parseFloat(document.getElementById('mw').value) || 0;
+            data.dry_weight = parseFloat(document.getElementById('md').value) || 0;
+        } else if (type === 'pulp_density') {
+            data.sg_dry = parseFloat(document.getElementById('sd').value) || 0;
+            data.sg_pulp = parseFloat(document.getElementById('sp').value) || 0;
+        } else if (type === 'fineness') {
+            data.gold_weight = parseFloat(document.getElementById('au').value) || 0;
+            data.total_weight = parseFloat(document.getElementById('wt').value) || 0;
+        } else if (type === 'weighted_avg') {
+            const rawData = document.getElementById('wavg-data').value;
+            const lines = rawData.trim().split('\n');
+            data.samples = [];
+
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+
+                // Split by space, comma, or tab
+                const parts = line.split(/[\s,]+/);
+                if (parts.length >= 2) {
+                    const weight = parseFloat(parts[0]);
+                    const grade = parseFloat(parts[1]);
+
+                    if (!isNaN(weight) && !isNaN(grade)) {
+                        data.samples.push({ weight, grade });
+                    }
+                }
+            }
+
+            if (data.samples.length === 0) {
+                alert('Please enter at least one valid line with "Weight Grade"');
+                return;
+            }
+        } else if (type === 'recovery') {
+            data.feed_grade = parseFloat(document.getElementById('feed').value) || 0;
+            data.concentrate_grade = parseFloat(document.getElementById('conc').value) || 0;
+            data.tailings_grade = parseFloat(document.getElementById('tail').value) || 0;
+        } else if (type === 'concentration_ratio') {
+            data.feed_grade = parseFloat(document.getElementById('cr_feed').value) || 0;
+            data.concentrate_grade = parseFloat(document.getElementById('cr_conc').value) || 0;
+        }
+
+        try {
+            const response = await postJSON('/tools/api/calculate', data);
+            if (response.status === 'success') {
+                document.getElementById('result-' + type).classList.remove('d-none');
+                document.getElementById('value-' + type).textContent = response.data.result.toFixed(4) + ' ' + response.data.unit;
+                document.getElementById('formula-' + type).textContent = response.data.formula_used;
+            } else {
+                alert('Error: ' + response.message);
+            }
+        } catch (e) {
+            alert('Calculation failed: ' + e.message);
+        }
+    }
+</script>
+{% endblock %}

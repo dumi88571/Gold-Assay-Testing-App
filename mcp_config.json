@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "gold-assay-ml": {
+      "command": "python",
+      "args": ["c:\\Users\\User\\Desktop\\AI Mining App\\mcp_server.py"],
+      "env": {
+        "FLASK_ENV": "production"
+      }
+    }
+  }
+}

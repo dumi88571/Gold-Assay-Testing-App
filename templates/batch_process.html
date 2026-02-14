@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Process Batch - {{ batch.batch_id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-lg border-0" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-body p-5 text-center">
+                <div class="mb-4">
+                    <div class="avatar-circle mx-auto mb-3"
+                        style="width: 80px; height: 80px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i class="fas fa-cogs fa-3x text-white"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Ready to Process</h3>
+                    <p class="text-muted">Batch ID: <span class="font-monospace text-dark fw-bold">{{ batch.batch_id
+                            }}</span></p>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="p-3 rounded bg-light border">
+                            <div class="small text-muted text-uppercase fw-bold">Sample Count</div>
+                            <div class="h3 fw-bold text-primary mb-0">{{ batch.sample_count }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded bg-light border">
+                            <div class="small text-muted text-uppercase fw-bold">Est. Time</div>
+                            <div class="h3 fw-bold text-success mb-0">~{{ (batch.sample_count * 0.5)|round|int + 1 }}s
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-warning mb-4 shadow-sm">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ML Model will validate and grade all samples.
+                </div>
+
+                <form method="POST" action="{{ url_for('batch.process', batch_id=batch.batch_id) }}">
+                    <div class="d-grid gap-3">
+                        <button type="submit"
+                            class="btn btn-gradient-primary btn-lg shadow-lg position-relative overflow-hidden">
+                            <span class="fw-bold"><i class="fas fa-play me-2"></i>Run Analysis Now</span>
+                        </button>
+                        <a href="{{ url_for('batch.index') }}"
+                            class="btn btn-link text-muted text-decoration-none small">
+                            Cancel and Return
+                        </a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-light border-0 py-3">
+                <div class="row text-start small">
+                    <div class="col-6"><span class="text-muted">Client:</span> <span class="fw-bold">{{
+                            batch.client_name or 'N/A' }}</span></div>
+                    <div class="col-6 text-end"><span class="text-muted">Uploaded:</span> {{
+                        batch.created_at.strftime('%H:%M %p') }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}Sample {{ sample.sample_id }} - Gold Assay Analyzer{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Main Details Card -->
+        <div class="card shadow-lg border-0 mb-4"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-bold text-primary"><i class="fas fa-vial me-2"></i>Sample Details</h5>
+                    <p class="text-muted small mb-0">Comprehensive analysis report</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('main.certificate', sample_id=sample.sample_id) }}"
+                        class="btn btn-gradient-primary shadow-sm" target="_blank">
+                        <i class="fas fa-print me-2"></i>Print Certificate
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row mb-5">
+                    <div class="col-md-7">
+                        <div class="p-3 rounded bg-light border h-100">
+                            <h6 class="text-uppercase small fw-bold text-muted mb-3">Sample Information</h6>
+                            <table class="table table-sm table-borderless mb-0">
+                                <tr>
+                                    <td class="text-muted w-50">Sample ID:</td>
+                                    <td class="fw-bold">{{ sample.sample_id }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Batch ID:</td>
+                                    <td class="font-monospace">{{ sample.batch_id or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Type:</td>
+                                    <td><span class="badge bg-secondary">{{ sample.sample_type }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Method:</td>
+                                    <td>{{ sample.assay_method }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Client:</td>
+                                    <td>{{ sample.client_name or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Date:</td>
+                                    <td>{{ sample.created_at.strftime('%Y-%m-%d %H:%M') if sample.created_at else '-' }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center"
+                            style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.2);">
+                            <div class="text-uppercase small fw-bold text-primary mb-1">Predicted Grade</div>
+                            <h1 class="display-4 fw-bold mb-0"
+                                style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                {{ "%.4f"|format(sample.predicted_grade or 0) }}</h1>
+                            <div class="text-muted mb-3">g/t Au</div>
+
+                            <div class="d-flex justify-content-between px-3 pt-3 border-top border-light">
+                                <div class="text-center">
+                                    <div class="small text-muted">Confidence</div>
+                                    <div class="fw-bold text-dark">{{ "%.1f"|format((sample.model_confidence or 0) *
+                                        100) }}%</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="small text-muted">Uncertainty</div>
+                                    <div class="fw-bold text-dark">±{{ "%.4f"|format(sample.uncertainty or 0) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="text-uppercase small fw-bold text-secondary mb-3 border-bottom pb-2">Analysis Status</h6>
+                <div class="row g-3 mb-5">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center p-3 rounded bg-light border">
+                            <i class="fas fa-traffic-light fa-2x me-3 text-muted opacity-50"></i>
+                            <div>
+                                <div class="small text-muted">Workflow Status</div>
+                                <div class="fw-bold">
+                                    {% if sample.status == 'completed' %}
+                                    <span class="text-success"><i class="fas fa-check-circle me-1"></i>Completed</span>
+                                    {% elif sample.status == 'validated' %}
+                                    <span class="text-info"><i class="fas fa-check-double me-1"></i>Validated</span>
+                                    {% elif sample.status == 'rejected' %}
+                                    <span class="text-danger"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+                                    {% else %}
+                                    <span class="text-secondary">{{ sample.status|title }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center p-3 rounded bg-light border">
+                            <i class="fas fa-shield-alt fa-2x me-3 text-muted opacity-50"></i>
+                            <div>
+                                <div class="small text-muted">Quality Control</div>
+                                <div class="fw-bold">
+                                    {% if sample.qc_passed %}
+                                    <span class="text-success"><i class="fas fa-check me-1"></i>Passed All Checks</span>
+                                    {% else %}
+                                    <span class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>{{
+                                        sample.qc_flags|join(', ') }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-uppercase small fw-bold text-secondary mb-3">Spectroscopy Data</h6>
+                        <ul class="list-group list-group-flush small">
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span class="text-muted">Absorption 242nm</span>
+                                <span class="font-monospace fw-bold">{{ "%.4f"|format(sample.absorption_242nm or 0)
+                                    }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span class="text-muted">Absorption 267nm</span>
+                                <span class="font-monospace fw-bold">{{ "%.4f"|format(sample.absorption_267nm or 0)
+                                    }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span class="text-muted">Emission Intensity</span>
+                                <span class="font-monospace fw-bold">{{ "%.4f"|format(sample.emission_intensity or 0)
+                                    }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-uppercase small fw-bold text-secondary mb-3">Elemental Composition</h6>
+                        <ul class="list-group list-group-flush small">
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span class="text-muted">Iron (Fe)</span>
+                                <span class="font-monospace fw-bold">{{ "%.1f"|format(sample.iron_ppm or 0) }}
+                                    ppm</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span class="text-muted">Copper (Cu)</span>
+                                <span class="font-monospace fw-bold">{{ "%.1f"|format(sample.copper_ppm or 0) }}
+                                    ppm</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span class="text-muted">Silver (Ag)</span>
+                                <span class="font-monospace fw-bold">{{ "%.1f"|format(sample.silver_ppm or 0) }}
+                                    ppm</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span class="text-muted">Sulfur (S)</span>
+                                <span class="font-monospace fw-bold">{{ "%.2f"|format(sample.sulfur_content or 0) }}
+                                    %</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6 class="text-uppercase small fw-bold text-secondary mb-3">Physical & Chemical Properties</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered mb-0 text-center">
+                                <thead class="bg-light text-muted">
+                                    <tr>
+                                        <th class="fw-normal">pH</th>
+                                        <th class="fw-normal">Temperature</th>
+                                        <th class="fw-normal">Ionic Strength</th>
+                                        <th class="fw-normal">Dissolved O₂</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-monospace">{{ "%.2f"|format(sample.solution_ph or 0) }}</td>
+                                        <td class="font-monospace">{{ "%.1f"|format(sample.temperature_c or 0) }} °C
+                                        </td>
+                                        <td class="font-monospace">{{ "%.3f"|format(sample.ionic_strength or 0) }}</td>
+                                        <td class="font-monospace">{{ "%.2f"|format(sample.dissolved_oxygen or 0) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {% if not sample.actual_grade %}
+                <div class="mt-5 p-4 rounded bg-light border border-dashed">
+                    <h6 class="text-uppercase small fw-bold text-dark mb-3"><i class="fas fa-edit me-2"></i>Validation
+                        Input</h6>
+                    <form method="POST" action="{{ url_for('analysis.update_sample', id=sample.id) }}"
+                        class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted">Actual Grade (g/t)</label>
+                            <input type="number" name="actual_grade" class="form-control" step="0.001"
+                                placeholder="Enter lab result" required>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-outline-primary w-100">Update & Validate</button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- AI Insights -->
+        {% if explanation %}
+        <div class="card shadow-sm border-0 mb-4 bg-white">
+            <div class="card-body">
+                <h6 class="text-uppercase small fw-bold text-primary mb-3">
+                    <i class="fas fa-lightbulb me-2"></i>AI Insights
+                </h6>
+                <div class="small text-muted mb-3">Top factors influencing this prediction:</div>
+
+                {% for factor in explanation %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="small fw-bold">{{ factor.feature }}</span>
+                        <span class="small {{ 'text-success' if factor.direction == 'positive' else 'text-danger' }}">
+                            {{ '+' if factor.direction == 'positive' else '' }}{{ "%.3f"|format(factor.impact) }}
+                        </span>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar {{ 'bg-success' if factor.direction == 'positive' else 'bg-danger' }}"
+                            role="progressbar"
+                            style="width: {{ (factor.impact|abs / explanation[0].impact|abs * 100)|int }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- QC Stats (Mini) -->
+        <div class="card shadow-sm border-0 mb-4 bg-white">
+            <div class="card-body">
+                <h6 class="text-uppercase small fw-bold text-muted mb-3">QC Metrics</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small text-muted">Calibration Drift</span>
+                    <span
+                        class="small font-monospace {{ 'text-danger fw-bold' if (sample.calibration_drift or 0) > 0.05 else 'text-success' }}">
+                        {{ "%.4f"|format(sample.calibration_drift or 0) }}
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small text-muted">Replicate RSD</span>
+                    <span
+                        class="small font-monospace {{ 'text-danger fw-bold' if (sample.replicate_rsd or 0) > 5.0 else 'text-success' }}">
+                        {{ "%.2f"|format(sample.replicate_rsd or 0) }}%
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="small text-muted">Blank Intensity</span>
+                    <span class="small font-monospace">{{ "%.2f"|format(sample.blank_intensity or 0) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Log -->
+        <div class="card shadow-sm border-0" style="background: rgba(255, 255, 255, 0.8);">
+            <div class="card-header bg-transparent border-bottom">
+                <i class="fas fa-list-alt me-2 text-secondary"></i>Audit Trail
+            </div>
+            <div class="list-group list-group-flush small" style="max-height: 400px; overflow-y: auto;">
+                {% for log in audit_logs %}
+                <div class="list-group-item bg-transparent">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold text-dark">{{ log.action }}</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">{{ log.timestamp.strftime('%m-%d %H:%M') if
+                            log.timestamp else '-' }}</span>
+                    </div>
+                    {% if log.notes %}
+                    <div class="text-muted mb-1 fst-italic">{{ log.notes }}</div>
+                    {% endif %}
+                    <div class="text-muted" style="font-size: 0.75rem;">
+                        <i class="fas fa-user-circle me-1"></i>{{ log.username }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="list-group-item bg-transparent text-muted text-center py-3">No activity recorded</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

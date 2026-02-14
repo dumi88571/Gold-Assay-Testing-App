@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - Gold Assay Analyzer{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 border-0 shadow-lg"
+            style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white;">
+            <div class="card-body text-center p-4">
+                <h6 class="text-uppercase small fw-bold opacity-75 mb-3">Total Samples</h6>
+                <h2 class="display-4 fw-bold mb-0">{{ sample_count }}</h2>
+                <div class="mt-2 small opacity-50"><i class="fas fa-database me-1"></i>Analyzed</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 border-0 shadow-lg position-relative overflow-hidden">
+            <div class="position-absolute top-0 start-0 w-100 h-100"
+                style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); z-index: 0;">
+            </div>
+            <div class="card-body text-center p-4 position-relative" style="z-index: 1;">
+                <h6 class="text-uppercase small fw-bold text-muted mb-3">Average Grade</h6>
+                <h2 class="display-5 fw-bold text-primary mb-0">{{ "%.2f"|format(stats.mean or 0) }}</h2>
+                <small class="text-muted fw-bold">g/t</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 border-0 shadow-lg position-relative overflow-hidden">
+            <div class="position-absolute top-0 start-0 w-100 h-100"
+                style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); z-index: 0;">
+            </div>
+            <div class="card-body text-center p-4 position-relative" style="z-index: 1;">
+                <h6 class="text-uppercase small fw-bold text-muted mb-3">Median Grade</h6>
+                <h2 class="display-5 fw-bold text-info mb-0">{{ "%.2f"|format(stats.median or 0) }}</h2>
+                <small class="text-muted fw-bold">g/t</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 border-0 shadow-lg position-relative overflow-hidden">
+            <div class="position-absolute top-0 start-0 w-100 h-100"
+                style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); z-index: 0;">
+            </div>
+            <div class="card-body text-center p-4 position-relative" style="z-index: 1;">
+                <h6 class="text-uppercase small fw-bold text-muted mb-3">Std Deviation</h6>
+                <h2 class="display-5 fw-bold text-secondary mb-0">{{ "%.2f"|format(stats.std or 0) }}</h2>
+                <small class="text-muted fw-bold">CV: {{ "%.1f"|format(stats.cv or 0) }}%</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-lg border-0 h-100"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent py-3">
+                <h5 class="mb-0 fw-bold text-primary"><i class="fas fa-chart-bar me-2"></i>Grade Distribution</h5>
+            </div>
+            <div class="card-body p-4">
+                <div style="height: 350px;">
+                    <canvas id="distChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-lg border-0 h-100"
+            style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-header border-0 bg-transparent py-3">
+                <h5 class="mb-0 fw-bold text-secondary"><i class="fas fa-list-alt me-2"></i>Statistics Summary</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">Count</td>
+                            <td class="pe-4 text-end fw-bold">{{ stats.count or 0 }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">Mean</td>
+                            <td class="pe-4 text-end font-monospace">{{ "%.3f"|format(stats.mean or 0) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">Median</td>
+                            <td class="pe-4 text-end font-monospace">{{ "%.3f"|format(stats.median or 0) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">Std Dev</td>
+                            <td class="pe-4 text-end font-monospace">{{ "%.3f"|format(stats.std or 0) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">Min</td>
+                            <td class="pe-4 text-end font-monospace">{{ "%.3f"|format(stats.min or 0) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">Max</td>
+                            <td class="pe-4 text-end font-monospace">{{ "%.3f"|format(stats.max or 0) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">Q1</td>
+                            <td class="pe-4 text-end font-monospace">{{ "%.3f"|format(stats.q1 or 0) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">Q3</td>
+                            <td class="pe-4 text-end font-monospace">{{ "%.3f"|format(stats.q3 or 0) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted small fw-bold text-uppercase">IQR</td>
+                            <td class="pe-4 text-end font-monospace">{{ "%.3f"|format(stats.iqr or 0) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-md border-0 bg-transparent">
+            <div class="card-body p-0">
+                <p class="text-uppercase small fw-bold text-muted mb-3 ps-1">Advanced Analytics</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('statistics.trends') }}"
+                        class="btn btn-white shadow-sm border px-4 py-3 flex-grow-1 text-start d-flex align-items-center hover-lift">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3 text-primary"><i
+                                class="fas fa-chart-line fa-lg"></i></div>
+                        <div>
+                            <div class="fw-bold text-dark">Trend Analysis</div>
+                            <div class="small text-muted">View historical performance</div>
+                        </div>
+                    </a>
+                    <a href="{{ url_for('statistics.outliers') }}"
+                        class="btn btn-white shadow-sm border px-4 py-3 flex-grow-1 text-start d-flex align-items-center hover-lift">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3 text-warning"><i
+                                class="fas fa-exclamation-triangle fa-lg"></i></div>
+                        <div>
+                            <div class="fw-bold text-dark">Outlier Detection</div>
+                            <div class="small text-muted">Identify anomalies</div>
+                        </div>
+                    </a>
+                    <a href="{{ url_for('statistics.correlations') }}"
+                        class="btn btn-white shadow-sm border px-4 py-3 flex-grow-1 text-start d-flex align-items-center hover-lift">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3 text-info"><i
+                                class="fas fa-project-diagram fa-lg"></i></div>
+                        <div>
+                            <div class="fw-bold text-dark">Correlations</div>
+                            <div class="small text-muted">Explore feature relationships</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const distData = JSON.parse('{{ distribution|tojson|safe }}');
+
+    new Chart(document.getElementById('distChart'), {
+        type: 'bar',
+        data: {
+            labels: distData.map(d => d.range),
+            datasets: [{
+                label: 'Count',
+                data: distData.map(d => d.count),
+                backgroundColor: 'rgba(52, 152, 219, 0.7)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const item = distData[context.dataIndex];
+                            return `Count: ${item.count} (${item.percentage}%)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

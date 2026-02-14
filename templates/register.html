@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Gold Assay Analyzer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5 col-lg-4">
+        <div class="card border-0 shadow-lg" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                    <div class="mb-4"
+                        style="display: inline-block; padding: 1rem; background: var(--gradient-success); border-radius: 50%; box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);">
+                        <i class="fas fa-user-plus fa-3x text-white"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1" style="color: var(--secondary);">Join the Team</h3>
+                    {% if first_user %}
+                    <p class="text-success fw-bold small"><i class="fas fa-crown me-1"></i>Administrator Account</p>
+                    {% else %}
+                    <p class="text-muted">Create your analyst profile</p>
+                    {% endif %}
+                </div>
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase small fw-bold text-muted">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0"><i
+                                    class="fas fa-user text-success"></i></span>
+                            <input type="text" name="username" class="form-control border-start-0 ps-0"
+                                placeholder="Choose a username" required minlength="3">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase small fw-bold text-muted">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0"><i
+                                    class="fas fa-envelope text-success"></i></span>
+                            <input type="email" name="email" class="form-control border-start-0 ps-0"
+                                placeholder="name@company.com" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-uppercase small fw-bold text-muted">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0"><i
+                                    class="fas fa-id-card text-success"></i></span>
+                            <input type="text" name="full_name" class="form-control border-start-0 ps-0"
+                                placeholder="John Doe">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-uppercase small fw-bold text-muted">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0"><i
+                                    class="fas fa-lock text-success"></i></span>
+                            <input type="password" name="password" class="form-control border-start-0 ps-0"
+                                placeholder="Min. 8 characters" required minlength="8">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 py-2 fs-6 shadow-sm">
+                        Create Account <i class="fas fa-check-circle ms-2"></i>
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="text-muted small mb-0">Already a member?</p>
+                    <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold text-success">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

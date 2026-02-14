@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Correlation Analysis - Gold Assay Analyzer{% endblock %}
+
+{% block content %}
+<div class="card shadow-lg border-0 mb-4" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+    <div class="card-header border-0 bg-transparent py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0 fw-bold text-primary"><i class="fas fa-project-diagram me-2"></i>Feature Correlations</h5>
+            <p class="text-muted small mb-0">Analyze relationships between assay parameters</p>
+        </div>
+        <div class="btn-group shadow-sm">
+            <a href="?days=30" class="btn btn-sm btn-outline-primary {% if days == 30 %}active{% endif %}">30 Days</a>
+            <a href="?days=60" class="btn btn-sm btn-outline-primary {% if days == 60 %}active{% endif %}">60 Days</a>
+            <a href="?days=90" class="btn btn-sm btn-outline-primary {% if days == 90 %}active{% endif %}">90 Days</a>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="alert alert-info border-0 shadow-sm mb-4"
+            style="background: rgba(56, 189, 248, 0.1); color: #0284c7;">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Understanding the Matrix:</strong> Values range from <span class="badge bg-danger">-1</span>
+            (perfect negative) to <span class="badge bg-success">+1</span> (perfect positive). Darker blue indicates
+            stronger correlation.
+        </div>
+
+        {% if features %}
+        <div class="table-responsive rounded shadow-sm">
+            <table class="table table-bordered mb-0 small">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="bg-light sticky-top" style="z-index: 2;">Feature</th>
+                        {% for feature in features %}
+                        <th class="text-center text-muted fw-bold bg-light sticky-top"
+                            style="writing-mode: vertical-rl; transform: rotate(180deg); min-height: 100px; z-index: 1;">
+                            {{ feature.replace('_', ' ')[:15] }}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row_feature in features %}
+                    <tr>
+                        <td class="fw-bold text-dark bg-light" style="white-space: nowrap;">{{ row_feature.replace('_',
+                            ' ') }}</td>
+                        {% for col_feature in features %}
+                        {% set corr = matrix.get(row_feature, {}).get(col_feature, 0) %}
+                        {% set bg_opacity = (corr|abs) * 0.8 %}
+                        {% set text_color = 'white' if corr|abs > 0.5 else 'black' %}
+                        <td class="text-center"
+                            style="background-color: hsla(210, 70%, 50%, {{ bg_opacity }}); color: {{ text_color }}; min-width: 40px;">
+                            {{ "%.2f"|format(corr) }}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row mt-4 g-4">
+            <div class="col-md-6">
+                <div class="card bg-light border-0 h-100">
+                    <div class="card-header bg-transparent border-0 fw-bold text-success"><i
+                            class="fas fa-arrow-up me-2"></i>Strong Positive (>0.5)</div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush bg-transparent">
+                            {% for row in features %}
+                            {% for col in features %}
+                            {% if row != col and matrix.get(row, {}).get(col, 0) > 0.5 %}
+                            <li
+                                class="list-group-item bg-transparent d-flex justify-content-between align-items-center small">
+                                <span><span class="fw-bold">{{ row }}</span> ↔ <span class="fw-bold">{{ col
+                                        }}</span></span>
+                                <span class="badge bg-success rounded-pill">{{ "%.3f"|format(matrix[row][col]) }}</span>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-light border-0 h-100">
+                    <div class="card-header bg-transparent border-0 fw-bold text-danger"><i
+                            class="fas fa-arrow-down me-2"></i>Strong Negative (<-0.5)< /div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush bg-transparent">
+                                    {% for row in features %}
+                                    {% for col in features %}
+                                    {% if row != col and matrix.get(row, {}).get(col, 0) < -0.5 %} <li
+                                        class="list-group-item bg-transparent d-flex justify-content-between align-items-center small">
+                                        <span><span class="fw-bold">{{ row }}</span> ↔ <span class="fw-bold">{{ col
+                                                }}</span></span>
+                                        <span class="badge bg-danger rounded-pill">{{ "%.3f"|format(matrix[row][col])
+                                            }}</span>
+                                        </li>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% endfor %}
+                                </ul>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3"><i class="fas fa-chart-bar fa-3x text-muted opacity-50"></i></div>
+                <h5 class="fw-bold text-muted">No Sufficient Data</h5>
+                <p class="text-muted small">Run more samples to generate correlation insights.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endblock %}

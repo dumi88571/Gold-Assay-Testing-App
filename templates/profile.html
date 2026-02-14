@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile - Gold Assay Analyzer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-user-circle me-2"></i>My Profile
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('auth.update_profile') }}">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-2 text-center">
+                            <div class="ratio ratio-1x1 rounded-circle bg-light d-flex align-items-center justify-content-center border"
+                                style="width: 100px; margin: 0 auto;">
+                                <span class="display-4 text-primary fw-bold">{{ user.username[0].upper() }}</span>
+                            </div>
+                            <div class="mt-2 text-muted small fw-bold text-uppercase">{{ user.role }}</div>
+                        </div>
+                        <div class="col-md-10">
+                            <h5 class="mb-3 text-secondary border-bottom pb-2">Personal Details</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-uppercase small text-muted">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-at text-muted"></i></span>
+                                        <input type="text" class="form-control" value="{{ user.username }}" disabled
+                                            style="background-color: rgba(0,0,0,0.02);">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-uppercase small text-muted">Full Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-id-card text-muted"></i></span>
+                                        <input type="text" name="full_name" class="form-control"
+                                            value="{{ user.full_name or '' }}" placeholder="Enter full name">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-uppercase small text-muted">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope text-muted"></i></span>
+                                        <input type="email" name="email" class="form-control" value="{{ user.email }}"
+                                            placeholder="name@example.com">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <h5 class="mb-3 text-secondary border-bottom pb-2">Security</h5>
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label text-uppercase small text-muted">Current Password</label>
+                                    <input type="password" name="current_password" class="form-control"
+                                        placeholder="Required to change password">
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label text-uppercase small text-muted">New Password</label>
+                                    <input type="password" name="new_password" class="form-control"
+                                        placeholder="Min. 8 characters">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-primary w-100 h-100"
+                                        style="min-height: 42px;">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-shield-alt me-2"></i>Account Status
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="ps-4 text-muted fw-bold" style="width: 200px;">Member Since</td>
+                            <td class="fw-bold text-dark">{{ user.created_at.strftime('%B %d, %Y') if user.created_at
+                                else 'Unknown' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted fw-bold">Last Login</td>
+                            <td class="fw-bold text-dark">{{ user.last_login.strftime('%B %d, %Y at %H:%M') if
+                                user.last_login else 'Never' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 text-muted fw-bold">Account Status</td>
+                            <td>
+                                {% if user.is_active %}
+                                <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Active</span>
+                                {% else %}
+                                <span class="badge bg-danger"><i class="fas fa-ban me-1"></i>Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
