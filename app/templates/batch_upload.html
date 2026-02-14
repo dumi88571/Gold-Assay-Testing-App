@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Batch - Gold Assay Analyzer{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0"
+                style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);">
+                <div class="card-header border-0 bg-transparent py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0 fw-bold text-primary"><i class="fas fa-cloud-upload-alt me-2"></i>Upload
+                                Batch</h4>
+                            <p class="text-muted small mb-0">Import samples for AI analysis</p>
+                        </div>
+                        <a href="{{ url_for('batch.index') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info border-0 shadow-sm mb-4"
+                        style="background: rgba(56, 189, 248, 0.1); color: #0284c7;">
+                        <div class="d-flex">
+                            <i class="fas fa-info-circle fa-lg me-3 mt-1"></i>
+                            <div>
+                                <h6 class="alert-heading fw-bold mb-1">File Requirements</h6>
+                                <p class="mb-0 small">Upload a CSV or Excel file. The first row must be headers matching
+                                    the analytical parameters (e.g., <code>absorption_242nm</code>,
+                                    <code>iron_ppm</code>).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('batch.upload') }}">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-uppercase small fw-bold text-muted">Batch Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fas fa-tag text-muted"></i></span>
+                                    <input type="text" name="batch_name"
+                                        class="form-control border-start-0 ps-0 bg-light"
+                                        placeholder="e.g., Field Samples Q1">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-uppercase small fw-bold text-muted">Client Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="fas fa-building text-muted"></i></span>
+                                    <input type="text" name="client_name"
+                                        class="form-control border-start-0 ps-0 bg-light"
+                                        placeholder="Client or Project">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label text-uppercase small fw-bold text-muted">Data File</label>
+                                <div class="p-4 border-2 border-dashed rounded bg-light text-center position-relative">
+                                    <input type="file" name="file"
+                                        class="form-control position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                                        accept=".csv,.xlsx,.json" required style="cursor: pointer;">
+                                    <div class="mb-2"><i class="fas fa-file-excel fa-3x text-success opacity-50"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1">Click to browse or drag file here</h6>
+                                    <p class="text-muted small mb-0">Supports .csv, .xlsx, .json</p>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-gradient-primary w-100 py-3 shadow-lg">
+                                    <span class="fw-bold"><i class="fas fa-check me-2"></i>Upload and Continue</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-5 pt-3 border-top">
+                        <button class="btn btn-link text-muted p-0 text-decoration-none small collapsed" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#formatExample">
+                            <i class="fas fa-chevron-down me-1"></i>View CSV Format Example
+                        </button>
+                        <div class="collapse mt-3" id="formatExample">
+                            <pre class="bg-dark text-white p-3 rounded small shadow-inner"><code>sample_type,assay_method,absorption_242nm,absorption_267nm,emission_intensity,...
+Concentrate,Fire Assay,0.45,0.38,0.52,...
+Tailings,Acid Digest,0.12,0.10,0.15,...</code></pre>
+                            <div class="small text-muted mt-2">
+                                <strong>Required Columns:</strong> sample_type, assay_method, absorption_242nm,
+                                absorption_267nm, emission_intensity, iron_ppm, copper_ppm, etc.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
