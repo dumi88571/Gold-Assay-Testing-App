@@ -1,0 +1,35 @@
+# Gold Assay Analyzer - Professional Edition
+# ===========================================
+#
+# Installation: pip install -r requirements.txt
+
+# Core Framework
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Login
+Werkzeug
+
+# Data Processing
+numpy
+pandas
+scikit-learn
+shap
+
+# Validation
+pydantic
+
+# Database
+SQLAlchemy
+
+# Utilities
+python-dotenv
+
+# MCP Server (for cloud deployment)
+mcp
+
+# Optional - for Excel file support
+# openpyxl
+
+# Production deployment
+gunicorn
